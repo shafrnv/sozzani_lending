@@ -84,31 +84,19 @@ img {
   line-height: 1.08;
 }
 
-.text--copy,
-.copy {
+.text--copy {
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
   max-height: calc(100svh - (var(--page-pad) * 2));
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-y;
-  scrollbar-gutter: stable;
-  scrollbar-width: thin;
-  scrollbar-color: rgb(255 255 255 / 0.35) transparent;
+  overflow: hidden;
   cursor: pointer;
 }
 
-.text--copy::-webkit-scrollbar,
-.copy::-webkit-scrollbar {
-  width: 6px;
-}
-
-.text--copy::-webkit-scrollbar-thumb,
-.copy::-webkit-scrollbar-thumb {
-  background: rgb(255 255 255 / 0.35);
-  border-radius: 3px;
+.text--copy .text__scroll {
+  --text-y: 0px;
+  transform: translate3d(0, var(--text-y), 0);
+  will-change: transform;
 }
 
 .text--copy .text-title {
@@ -430,6 +418,10 @@ p.text:not(.text--copy).is-en .lang-content--en {
 
   .pan-moving,
   .pan-moving.flip-x {
+    transform: none;
+  }
+
+  .text--copy .text__scroll {
     transform: none;
   }
 }
