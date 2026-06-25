@@ -84,13 +84,31 @@ img {
   line-height: 1.08;
 }
 
-.text--copy {
+.text--copy,
+.copy {
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
   max-height: calc(100svh - (var(--page-pad) * 2));
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.35) transparent;
   cursor: pointer;
+}
+
+.text--copy::-webkit-scrollbar,
+.copy::-webkit-scrollbar {
+  width: 6px;
+}
+
+.text--copy::-webkit-scrollbar-thumb,
+.copy::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 0.35);
+  border-radius: 3px;
 }
 
 .text--copy .text-title {
@@ -216,6 +234,10 @@ img {
   bottom: auto;
   left: var(--page-pad);
   width: min(72vw, 920px);
+  max-height: min(
+    calc(100svh - (var(--page-pad) * 2)),
+    calc(100svh - min(68svh, 620px) - (var(--page-pad) * 3))
+  );
   margin: 0;
   justify-content: flex-start;
   text-align: left;
@@ -284,9 +306,9 @@ img {
 }
 
 .copy {
+  display: flex;
   padding: var(--page-pad);
   color: #fff;
-  cursor: pointer;
 }
 
 .copy p {
@@ -373,6 +395,14 @@ p.text:not(.text--copy).is-en .lang-content--en {
   .pin-pan__stage > .static-layer {
     width: min(56vw, 300px);
     height: 46svh;
+  }
+
+  .pin-pan[aria-label="Group 5"] > .pin-pan__stage > .text,
+  .pin-pan[aria-label="Group 20"] > .pin-pan__stage > .text {
+    max-height: min(
+      calc(100svh - (var(--page-pad) * 2)),
+      calc(100svh - 46svh - (var(--page-pad) * 3))
+    );
   }
 
   .pin-pan[aria-label="Group 26"] > .pin-pan__stage > .static-layer {

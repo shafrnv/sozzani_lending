@@ -25,6 +25,27 @@ function initLanguageToggles() {
   });
 }
 
+function initScrollableCopy() {
+  document.querySelectorAll('.text--copy, .copy').forEach((panel) => {
+    panel.addEventListener(
+      'wheel',
+      (event) => {
+        if (panel.scrollHeight <= panel.clientHeight + 1) return;
+
+        const { deltaY } = event;
+        const atTop = panel.scrollTop <= 0;
+        const atBottom = panel.scrollTop + panel.clientHeight >= panel.scrollHeight - 1;
+
+        if ((deltaY < 0 && !atTop) || (deltaY > 0 && !atBottom)) {
+          event.preventDefault();
+          panel.scrollTop += deltaY;
+        }
+      },
+      { passive: false },
+    );
+  });
+}
+
 function initLazyImages() {
   document.querySelectorAll('img').forEach((img) => {
     const inHero = img.closest('[aria-label="Group 0"], [aria-label="Group 1"]');
@@ -56,8 +77,9 @@ function measurePanSections() {
     const stageWidth = item.stage.clientWidth || window.innerWidth;
     const stageHeight = item.stage.offsetHeight || window.innerHeight;
     const movingWidth = item.moving.scrollWidth || item.moving.offsetWidth;
+    const startOffset = item.moving.offsetLeft;
 
-    item.maxTranslate = Math.max(movingWidth - stageWidth, 0);
+    item.maxTranslate = Math.max(movingWidth + startOffset - stageWidth, 0);
 
     const useEndHold = !item.section.hasAttribute('data-no-end-hold');
     item.endHold = useEndHold && item.maxTranslate > 0 ? stageHeight * END_HOLD_RATIO : 0;
@@ -99,6 +121,29 @@ function animatePanSections() {
   requestAnimationFrame(animatePanSections);
 }
 
+function remeasurePanSections() {
+  measurePanSections();
+  syncPanTargets();
+}
+
+function initPanSectionRemeasure() {
+  panSections.forEach(({ moving }) => {
+    if (!moving) return;
+
+    moving.querySelectorAll('img').forEach((img) => {
+      if (img.complete && img.naturalWidth) return;
+      img.addEventListener('load', remeasurePanSections, { once: true });
+    });
+  });
+
+  if (typeof ResizeObserver === 'undefined') return;
+
+  const observer = new ResizeObserver(remeasurePanSections);
+  panSections.forEach(({ moving }) => {
+    if (moving) observer.observe(moving);
+  });
+}
+
 function refresh() {
   markImageRatios();
   measurePanSections();
@@ -112,5 +157,7 @@ window.addEventListener('load', refresh);
 markImageRatios();
 initLazyImages();
 initLanguageToggles();
+initScrollableCopy();
+initPanSectionRemeasure();
 refresh();
 animatePanSections();
